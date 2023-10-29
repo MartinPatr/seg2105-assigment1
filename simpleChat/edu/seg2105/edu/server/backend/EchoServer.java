@@ -5,6 +5,9 @@ package edu.seg2105.edu.server.backend;
 // license found at www.lloseng.com 
 
 import ocsf.server.*;
+import edu.seg2105.common.*;
+import java.io.*;
+
 
 /**
  * This class overrides some of the methods in the abstract
@@ -23,6 +26,9 @@ public class EchoServer extends AbstractServer {
    */
   final public static int DEFAULT_PORT = 3009;
 
+
+  ChatIF serverUI;
+
   // Constructors ****************************************************
 
   /**
@@ -30,8 +36,14 @@ public class EchoServer extends AbstractServer {
    *
    * @param port The port number to connect on.
    */
-  public EchoServer(int port) {
+  public EchoServer(int port, ChatIF serverUI) {
     super(port);
+    this.serverUI = serverUI;
+    try {
+      listen(); // Start listening for connections
+    } catch (Exception ex) {
+      System.out.println("ERROR - Could not listen for clients!");
+    }
   }
 
   // Instance methods ************************************************
@@ -84,32 +96,85 @@ public class EchoServer extends AbstractServer {
   synchronized protected void clientDisconnected(ConnectionToClient client) {
     System.out.println("Client disconnected: " + client.toString());
     }
-
-  // Class methods ***************************************************
-
+    
+  
+  
   /**
-   * This method is responsible for the creation of
-   * the server instance (there is no UI in this phase).
-   *
-   * @param args[0] The port number to listen on. Defaults to default port
-   *                if no argument is entered.
+   * Handle a message sent from the server console
+   * @param message
    */
-  public static void main(String[] args) {
-    int port = 0; // Port to listen on
-
-    try {
-      port = Integer.parseInt(args[0]); // Get port from command line
-    } catch (Throwable t) {
-      port = DEFAULT_PORT; 
-    }
-
-    EchoServer sv = new EchoServer(port);
-
-    try {
-      sv.listen(); // Start listening for connections
-    } catch (Exception ex) {
-      System.out.println("ERROR - Could not listen for clients!");
+  public void handleMessageFromServerUI(String message){
+    if(message.charAt(0) == '#'){
+      runCommand(message);
+    }else{
+      serverUI.display(message);
+      sendToAllClients("SERVER MSG> " + message);
     }
   }
+
+  /**
+   * This method executes server commands.
+   *
+   * @param message String from the server console.
+   */
+  public void runCommand(String Message) {
+    String[] command = Message.split(" ");
+    switch (command[0]) {
+        case "#quit":
+            quit();
+            break;
+        case "#stop":
+            stopListening();
+            break;
+        case "#close":
+            try {
+                close();
+            } catch (IOException e) {
+                System.out.println("Error closing the server");
+            }
+            break;
+        case "#setport":
+            if (!isListening()) {
+              try{
+                setPort(Integer.parseInt(command[1]));
+              }catch(ArrayIndexOutOfBoundsException e){
+                serverUI.display("Please enter a port number");
+              } 
+              catch (NumberFormatException e) {
+                serverUI.display("Port must be a number");
+              }
+            } else {
+                serverUI.display("Server must be closed to change port");
+            }
+            break;
+        case "#start":
+            if (!isListening()) {
+                try {
+                    listen();
+                } catch (IOException e) {
+                    System.out.println("Error starting the server");
+                }
+            } else {
+                serverUI.display("Server is already listening for connections");
+            }
+            break;
+        case "#getport":
+            serverUI.display("Port: " + getPort());
+            break;
+        default:
+            serverUI.display("Command not recognized");
+            break;
+    }
+}
+
+public void quit(){
+  try{
+    close();
+  }catch(IOException e){
+    System.out.println("Error closing the server");
+  }
+  System.exit(0);
+}
+
 }
 // End of EchoServer class

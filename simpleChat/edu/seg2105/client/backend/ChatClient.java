@@ -8,7 +8,7 @@ import ocsf.client.*;
 
 import java.io.*;
 
-import edu.seg2105.client.common.*;
+import edu.seg2105.common.*;
 
 /**
  * This class overrides some of the methods defined in the abstract

@@ -8,7 +8,8 @@ import java.io.*;
 import java.util.Scanner;
 
 import edu.seg2105.client.backend.ChatClient;
-import edu.seg2105.client.common.*;
+import edu.seg2105.common.*;
+
 
 /**
  * This class constructs the UI for a chat client. It implements the
@@ -70,7 +71,6 @@ public class ClientConsole implements ChatIF {
   public void accept() {
     try {
 
-      
       String message;
 
       while (true) {
