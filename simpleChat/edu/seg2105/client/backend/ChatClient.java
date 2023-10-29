@@ -63,10 +63,77 @@ public class ChatClient extends AbstractClient {
    */
   public void handleMessageFromClientUI(String message) {
     try {
-      sendToServer(message);
+      if (message.charAt(0) == '#') {
+        runCommand(message);
+      } else {
+        sendToServer(message);
+      }
     } catch (IOException e) {
       clientUI.display("Could not send message to server.  Terminating client.");
       quit();
+    }
+  }
+
+  /**
+   * This method executes client commands
+   *
+   * @param message String from the client console
+   */
+  public void runCommand(String message) {
+    String[] command = message.split(" ");
+    switch (command[0]) {
+      case "#quit":
+        quit();
+        break;
+      case "#logoff":
+        try {
+          closeConnection();
+        } catch (IOException e) {
+        }
+        break;
+      case "#sethost":
+        if (isConnected()) {
+          System.out.println("You must log off before setting the host");
+          break;
+        }
+        try{
+          setHost(command[1]);
+        }
+        catch(Exception e){
+          System.out.println("Invalid host");
+        }
+        break;
+      case "#setport":
+        if (isConnected()) {
+          System.out.println("You must log off before setting the port");
+          break;
+        } try {
+          setPort(Integer.parseInt(command[1]));
+        }
+        catch(Exception e){
+          System.out.println("Invalid port");
+        }
+        break;
+      case "#login":
+        if (isConnected()) {
+          System.out.println("You must log off before logging in");
+          break;
+        }
+        try {
+          System.out.println("Logging in...");
+          openConnection();
+        } catch (IOException e) {
+        }
+        break;
+      case "#gethost":
+        System.out.println(getHost());
+        break;
+      case "#getport":
+        System.out.println(getPort());
+        break;
+      default:
+        System.out.println("Command not recognized");
+        break;
     }
   }
 

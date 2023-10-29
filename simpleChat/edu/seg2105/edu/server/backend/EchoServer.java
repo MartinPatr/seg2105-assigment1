@@ -21,7 +21,7 @@ public class EchoServer extends AbstractServer {
   /**
    * The default port to listen on.
    */
-  final public static int DEFAULT_PORT = 3003;
+  final public static int DEFAULT_PORT = 3009;
 
   // Constructors ****************************************************
 
@@ -63,13 +63,35 @@ public class EchoServer extends AbstractServer {
     System.out.println("Server has stopped listening for connections.");
   }
 
+  /**
+   * Hook method called each time a new client connection is
+   * accepted. The default implementation does nothing.
+   * @param client the connection connected to the client.
+   */
+  @Override
+  protected void clientConnected(ConnectionToClient client) {
+    System.out.println("Client connected: " + client.toString());
+  }
+
+  /**
+   * Hook method called each time a client disconnects.
+   * The default implementation does nothing. The method
+   * may be overridden by subclasses but should remains synchronized.
+   *
+   * @param client the connection with the client.
+   */
+  @Override
+  synchronized protected void clientDisconnected(ConnectionToClient client) {
+    System.out.println("Client disconnected: " + client.toString());
+    }
+
   // Class methods ***************************************************
 
   /**
    * This method is responsible for the creation of
    * the server instance (there is no UI in this phase).
    *
-   * @param args[0] The port number to listen on. Defaults to 5555
+   * @param args[0] The port number to listen on. Defaults to default port
    *                if no argument is entered.
    */
   public static void main(String[] args) {
@@ -78,7 +100,7 @@ public class EchoServer extends AbstractServer {
     try {
       port = Integer.parseInt(args[0]); // Get port from command line
     } catch (Throwable t) {
-      port = DEFAULT_PORT; // Set port to 5555
+      port = DEFAULT_PORT; 
     }
 
     EchoServer sv = new EchoServer(port);

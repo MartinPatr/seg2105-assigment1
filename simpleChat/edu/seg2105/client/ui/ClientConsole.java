@@ -25,7 +25,7 @@ public class ClientConsole implements ChatIF {
   /**
    * The default port to connect on.
    */
-  final public static int DEFAULT_PORT = 3003;
+  final public static int DEFAULT_PORT = 3009;
 
   // Instance variables **********************************************
 
@@ -70,6 +70,7 @@ public class ClientConsole implements ChatIF {
   public void accept() {
     try {
 
+      
       String message;
 
       while (true) {
