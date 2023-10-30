@@ -1,6 +1,5 @@
 package edu.seg2105.edu.server.backend;
 
-import java.io.*;
 import java.util.Scanner;
 
 import edu.seg2105.common.*;
@@ -16,7 +15,7 @@ public class ServerConsole implements ChatIF {
   /**
    * The default port to connect on.
    */
-  final public static int DEFAULT_PORT = 3009;
+  final public static int DEFAULT_PORT = 5555;
 
   // Instance variables **********************************************
 
@@ -49,7 +48,7 @@ public class ServerConsole implements ChatIF {
 
   /**
    * This method waits for input from the console. Once it is
-   * received, it sends it to the client's message handler.
+   * received, it sends it to the server's message handler.
    */
   public void accept() {
     try {
@@ -76,12 +75,12 @@ public class ServerConsole implements ChatIF {
   // Class methods ***************************************************
 
   /**
-   * This method is responsible for the creation of the Client UI.
+   * This method is responsible for the creation of the Server UI.
    *
    * @param args[0] The host to connect to.
    */
   public static void main(String[] args) {
-    int port = 0;  //The port number
+    int port = 0;  
 
     try {
       port = Integer.parseInt(args[0]);
@@ -93,3 +92,4 @@ public class ServerConsole implements ChatIF {
     chat.accept();  //Wait for console data
   }
 }
+// End of ServerConsole class

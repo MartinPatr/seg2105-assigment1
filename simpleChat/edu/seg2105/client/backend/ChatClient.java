@@ -27,6 +27,11 @@ public class ChatClient extends AbstractClient {
    */
   ChatIF clientUI;
 
+  /**
+   * The login ID of the client
+   */
+  String loginId;
+
   // Constructors ****************************************************
 
   /**
@@ -37,11 +42,15 @@ public class ChatClient extends AbstractClient {
    * @param clientUI The interface type variable.
    */
 
-  public ChatClient(String host, int port, ChatIF clientUI)
+  public ChatClient(String loginId ,String host, int port, ChatIF clientUI)
       throws IOException {
     super(host, port); // Call the superclass constructor
+    this.loginId = loginId;
     this.clientUI = clientUI;
     openConnection();
+    if (loginId == ""){
+      System.out.println("ERROR - No login ID specified.  Connection aborted.");
+    }
   }
 
   // Instance methods ************************************************
@@ -156,5 +165,14 @@ public class ChatClient extends AbstractClient {
   protected void connectionClosed() {
     clientUI.display("Connection is closed");
   }
+
+	protected void connectionEstablished() {
+    try {
+      sendToServer("#login " + loginId);
+    } catch (IOException e) {
+      System.out.println("Could not login to server, terminating client.");
+      quit();
+    }
+	}  
 }
 // End of ChatClient class

@@ -21,12 +21,6 @@ import java.io.*;
 public class EchoServer extends AbstractServer {
   // Class variables *************************************************
 
-  /**
-   * The default port to listen on.
-   */
-  final public static int DEFAULT_PORT = 3009;
-
-
   ChatIF serverUI;
 
   // Constructors ****************************************************
@@ -55,16 +49,45 @@ public class EchoServer extends AbstractServer {
    * @param client The connection from which the message originated.
    */
   public void handleMessageFromClient(Object msg, ConnectionToClient client) {
-    System.out.println("Message received: " + msg + " from " + client);
+
+    System.out.println("Message received: " + msg + " from " + client.getInfo("loginId"));
+
+    String stringMsg = (String)msg;
+    String[] stringMsgs = stringMsg.split(" ");
+  
+    // if the message is the login commands
+    if (stringMsgs[0].equals("#login")){
+      if(client.getInfo("loginId") != null ){
+        try {
+          client.sendToClient("Error: You are already logged in");
+          client.close();
+        } catch (IOException e) {
+          System.out.println("Error: Could not close client connection after failed login attempt");
+        }
+      } else{
+        client.setInfo("loginId", stringMsgs[1]);
+        try{
+          System.out.println(client.getInfo("loginId") + " has logged on.");
+          this.sendToAllClients(client.getInfo("loginId") + " has logged on.");
+        } catch (Exception e){
+          System.out.println("Error: Could not send login confirmation to all clients");
+        }
+      }
+
+    }else{ 
+
+    msg = client.getInfo("loginId") + ": " + msg;
     this.sendToAllClients(msg);
+    }
   }
+
 
   /**
    * This method overrides the one in the superclass. Called
    * when the server starts listening for connections.
    */
   protected void serverStarted() {
-    System.out.println("Server listening for connections on port " + getPort());
+    System.out.println("Server listening for clients on port " + getPort());
   }
 
   /**
@@ -167,6 +190,9 @@ public class EchoServer extends AbstractServer {
     }
 }
 
+/**
+ * This method terminates the server.
+ */
 public void quit(){
   try{
     close();
